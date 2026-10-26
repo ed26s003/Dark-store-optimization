@@ -43,7 +43,7 @@ def generate_instance(n_customers: int, n_stores: int, seed: int = 42,
         lon = land_centres[selected, 1] + rng.normal(0, 0.004, n)
 
         return lat, lon
-```
+
     clat, clon = points(n_customers)
     slat, slon = points(n_stores)
     customers = pd.DataFrame({"customer_id": [f"C{i+1:05d}" for i in range(n_customers)],
