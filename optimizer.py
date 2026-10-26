@@ -16,7 +16,7 @@ def generate_instance(n_customers: int, n_stores: int, seed: int = 42,
     if demand_min < 1 or demand_max < demand_min:
         raise ValueError("Demand bounds must satisfy 1 <= minimum <= maximum.")
     rng = np.random.default_rng(seed)
-    ```python
+    
     def points(n):
         # Generate synthetic points around inland Chennai urban areas.
         # This avoids sampling uniformly across the sea and land together.
