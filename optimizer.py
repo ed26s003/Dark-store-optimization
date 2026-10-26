@@ -16,14 +16,34 @@ def generate_instance(n_customers: int, n_stores: int, seed: int = 42,
     if demand_min < 1 or demand_max < demand_min:
         raise ValueError("Demand bounds must satisfy 1 <= minimum <= maximum.")
     rng = np.random.default_rng(seed)
+    ```python
     def points(n):
-        # A mild centrality mixture produces a city-like spatial pattern while staying reproducible.
-        central = rng.random(n) < 0.65
-        lat = np.where(central, rng.normal(13.08, 0.065, n), rng.uniform(CHENNAI_BOUNDS["lat_min"], CHENNAI_BOUNDS["lat_max"], n))
-        lon = np.where(central, rng.normal(80.25, 0.065, n), rng.uniform(CHENNAI_BOUNDS["lon_min"], CHENNAI_BOUNDS["lon_max"], n))
-        lat = np.clip(lat, CHENNAI_BOUNDS["lat_min"], CHENNAI_BOUNDS["lat_max"])
-        lon = np.clip(lon, CHENNAI_BOUNDS["lon_min"], CHENNAI_BOUNDS["lon_max"])
+        # Generate synthetic points around inland Chennai urban areas.
+        # This avoids sampling uniformly across the sea and land together.
+        # Coordinates represent approximate area centres, not real addresses.
+        land_centres = np.array([
+            [12.9249, 80.1000],  # Tambaram
+            [13.0382, 80.1565],  # Porur
+            [13.0067, 80.2206],  # Guindy
+            [13.0850, 80.2101],  # Anna Nagar
+            [13.1143, 80.1548],  # Ambattur
+            [13.0835, 80.1750],  # Mogappair
+            [12.9750, 80.2200],  # Velachery
+            [12.9516, 80.1462],  # Chromepet
+            [13.0480, 80.0940],  # Poonamallee
+            [13.0694, 80.1948],  # Koyambedu
+        ])
+
+        # Randomly select an inland area for each point.
+        selected = rng.integers(0, len(land_centres), size=n)
+
+        # Add small random variations so points do not overlap exactly.
+        # The spread is approximately a few hundred metres.
+        lat = land_centres[selected, 0] + rng.normal(0, 0.004, n)
+        lon = land_centres[selected, 1] + rng.normal(0, 0.004, n)
+
         return lat, lon
+```
     clat, clon = points(n_customers)
     slat, slon = points(n_stores)
     customers = pd.DataFrame({"customer_id": [f"C{i+1:05d}" for i in range(n_customers)],
